@@ -1,0 +1,40 @@
+import numpy as np
+import pandas as pd
+from pandas import DataFrame,Series
+
+import sqlite3 as db
+from pandasql import sqldf
+pysqldf=lambda q:sqldf(q,globals())
+
+df=pd.read_csv("https://archive.ics.uci.edu/ml/machine-learning-databases/adult/adult.data")
+df.columns
+
+df.rename(columns={'39':'age',' State-gov':'workclass',' 77516':'fnlwgt',' Bachelors':'education',' 13':'education-num',' Never-married':'marital-status',' Adm-clerical':'occupation',' Not-in-family':'relationship',' White':'race',' Male':'sex',' 2174':'capital-gain',' 0':'capital-loss',' 40':'hours-per-week',' United-States':'native-country'},inplace=True)
+
+sqladb=pysqldf('Select * from df')
+
+'''
+--------------------------------------------------------------------------------------------------
+'''
+#1
+pysqldf('Select * from sqladb Limit 10')
+
+#2
+pysqldf("Select workclass,sex,avg([hours-per-week]) as Avg from sqladb group by workclass,sex having sex=' Male' and workclass=' Private'  ")
+
+#3
+pysqldf("Select education,count(*) from sqladb group by education")
+pysqldf("Select occupation,count(*) from sqladb group by occupation")
+pysqldf("Select relationship,count(*) from sqladb group by relationship")
+
+#4
+pysqldf("Select count(*) as Total from sqladb where [marital-status] like '%Married-%' and education=' Masters' ")
+
+#5
+pysqldf("Select avg(age),max(age),min(age),workclass from sqladb group by workclass")
+
+#6
+pysqldf("Select [native-country],avg(age),max(age),min(age) from sqladb group by [native-country]")
+
+#7
+pysqldf("Select *,[capital-gain]-[capital-loss] as 'Net-Capital-Gain' from sqladb")
